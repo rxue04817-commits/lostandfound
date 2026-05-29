@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bean.lostandfound.mapper.LostFoundMapper">
+    <insert id="insert" useGeneratedKeys="true"  keyProperty="id">
+        INSERT INTO lost_found(user_id, title, content, location, date, status, contact_phone, created_at, updated_at)
+        values (#{userId}, #{title}, #{content}, #{location}, #{date}, #{status}, #{contactPhone}, #{createdAt}, #{updatedAt})
+    </insert>
+    <update id="update">
+        UPDATE lost_found
+        SET
+            title = #{title},
+            content = #{content},
+            location = #{location},
+            date = #{date},
+            contact_phone = #{contactPhone},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+
+    <select id="selectByCondition" resultType="com.bean.lostandfound.pojo.entity.LostFound">
+        SELECT * FROM lost_found
+        <where>
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+            <if test="location != null and location != ''">
+                AND location LIKE CONCAT('%', #{location}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+    <select id="selectExpiredLostFound" resultType="com.bean.lostandfound.pojo.entity.LostFound">
+        SELECT * FROM lost_found
+        WHERE status = 1
+          AND created_at &lt;= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    </select>
+    <update id="updateStatus" parameterType="com.bean.lostandfound.pojo.entity.LostFound">
+        UPDATE lost_found
+        SET
+            status = #{status},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+</mapper>
