@@ -15,7 +15,5 @@ import java.util.List;
 public class LostFoundVO extends LostFound {
     private User userInfo;
     private List<String> images;
-
-    // 从 LostFound 继承的属性:
-    // id, userId, title, content, location, date, status, contactPhone, createdAt, updatedAt
+    private String categoryName;
 }

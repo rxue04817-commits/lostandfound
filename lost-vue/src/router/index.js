@@ -19,7 +19,7 @@ const routes = [
       {
         path: '/publish',
         component: () => import('@/views/lost/PublishView.vue'),
-        meta: { title: '发布失物', requiresAuth: true }
+        meta: { title: '发布信息', requiresAuth: true }
       },
       {
         path: '/my-posts',
@@ -29,7 +29,7 @@ const routes = [
       {
         path: '/all-posts',
         component: () => import('@/views/lost/LostViews.vue'),
-        meta: { title: '失物信息', requiresAuth: true }
+        meta: { title: '信息浏览', requiresAuth: true }
       },
       {
         path: '/profile',

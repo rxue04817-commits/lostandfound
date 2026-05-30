@@ -13,8 +13,10 @@ public class LostSearchDTO {
     private String title;             //标题
     private String content;             //描述
     private String location;         // 地点筛选
-    private Integer status;          // 状态筛选：0=待审核,
+    private Integer status;          // 状态筛选
     private Integer userId;
+    private Integer itemType;        // 0=失物, 1=拾物
+    private Integer categoryId;
     // 添加自定义getter确保返回默认值
     public Integer getPage() {
         return page != null ? page : 1;

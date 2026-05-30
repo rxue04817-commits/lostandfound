@@ -14,6 +14,9 @@ import java.util.List;
 public class LostFoundDetailVO {
     private Integer id;
     private Integer userId;
+    private Integer itemType;
+    private Integer categoryId;
+    private String categoryName;
     private String title;
     private String content;
     private String location;

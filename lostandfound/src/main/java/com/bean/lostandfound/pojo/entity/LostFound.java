@@ -14,6 +14,10 @@ public class LostFound {
 
     private Integer userId;
 
+    private Integer itemType = 0;
+
+    private Integer categoryId;
+
     private String title;
 
     private String content;

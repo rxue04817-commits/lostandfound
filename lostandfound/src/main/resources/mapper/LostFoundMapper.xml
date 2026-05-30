@@ -3,8 +3,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.bean.lostandfound.mapper.LostFoundMapper">
     <insert id="insert" useGeneratedKeys="true"  keyProperty="id">
-        INSERT INTO lost_found(user_id, title, content, location, date, status, contact_phone, created_at, updated_at)
-        values (#{userId}, #{title}, #{content}, #{location}, #{date}, #{status}, #{contactPhone}, #{createdAt}, #{updatedAt})
+        INSERT INTO lost_found(user_id, item_type, category_id, title, content, location, date, status, contact_phone, created_at, updated_at)
+        values (#{userId}, #{itemType}, #{categoryId}, #{title}, #{content}, #{location}, #{date}, #{status}, #{contactPhone}, #{createdAt}, #{updatedAt})
     </insert>
     <update id="update">
         UPDATE lost_found
@@ -36,6 +36,12 @@
             </if>
             <if test="userId != null">
                 AND user_id = #{userId}
+            </if>
+            <if test="itemType != null">
+                AND item_type = #{itemType}
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
             </if>
         </where>
         ORDER BY created_at DESC

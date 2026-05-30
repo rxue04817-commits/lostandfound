@@ -50,7 +50,7 @@ const isAdministrator = computed(() => {
                 <el-icon>
                   <Plus />
                 </el-icon>
-                <span>发布失物</span>
+                <span>发布信息</span>
               </el-menu-item>
               <el-menu-item index="/my-posts">
                 <el-icon>
@@ -62,7 +62,7 @@ const isAdministrator = computed(() => {
                 <el-icon>
                   <Document />
                 </el-icon>
-                <span>失物信息</span>
+                <span>信息浏览</span>
               </el-menu-item>
               <el-menu-item index="/profile">
                 <el-icon>

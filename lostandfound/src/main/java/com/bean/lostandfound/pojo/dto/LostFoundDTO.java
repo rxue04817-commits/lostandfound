@@ -11,6 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LostFoundDTO {
+    private Integer itemType;
+    private Integer categoryId;
     private String title;
     private String content;
     private String location;

@@ -1,6 +1,18 @@
 // src/api/lostApi.js
 import request from './request'
 
+export async function getCategories() {
+  try {
+    const response = await request.get('/categories')
+    if (response.data.code === 1) {
+      return { success: true, data: response.data.data }
+    }
+    return { success: false, message: response.data.msg || '获取分类失败' }
+  } catch (error) {
+    return { success: false, message: '获取分类失败' }
+  }
+}
+
 export async function getLostFoundList(params) {
   try {
     const response = await request.get('/lostfound', { params })
@@ -92,14 +104,14 @@ export async function publishLostFound(data) {
 export async function deleteLostFound(id) {
   try {
     const response = await request.delete(`/lostfound/delete/${id}`)
-    return {
-      success: true,
-      data: response.data
+    if (response.data.code === 1) {
+      return { success: true, data: response.data }
     }
+    return { success: false, message: response.data.msg || '删除失败' }
   } catch (error) {
     return {
       success: false,
-      message: '删除失败'
+      message: error.response?.data?.msg || '删除失败'
     }
   }
 }
@@ -154,10 +166,11 @@ export async function updateLostFoundStatus(id, status) {
         data: response.data
       }
     }
+    return { success: false, message: response.data.msg || '状态更新失败' }
   } catch (error) {
     return {
       success: false,
-      message: '状态更新失败'
+      message: error.response?.data?.msg || '状态更新失败'
     }
   }
 }
