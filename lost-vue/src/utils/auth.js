@@ -109,7 +109,7 @@ export function parseToken(token) {
 export function getUserId() {
   const token = getToken()
   const payload = parseToken(token)
-  return payload ? payload.id : null
+  return payload ? payload.userId : null
 }
 
 /**

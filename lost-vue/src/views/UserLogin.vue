@@ -32,8 +32,7 @@ const registerForm = reactive({
     realName: '',
     password: '',
     phone: '',
-    email: '',
-    role: 0
+    email: ''
 })
 const username = ref()
 // 登录表单验证规则
@@ -63,9 +62,6 @@ const registerRules = {
     email: [
         { required: true, message: '请输入邮箱', trigger: 'blur' },
         { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
-    ],
-    role: [
-        { required: true, message: '请选择角色', trigger: 'change' }
     ]
 }
 
@@ -81,7 +77,7 @@ const handleLogin = async () => {
             // 跳转到主页面
             router.push('/layout')
         } else {
-            ElMessage.error(result.message || '登录失败')
+            ElMessage.error(result.message)
         }
     } catch (error) {
         ElMessage.error('登录请求异常')
@@ -99,8 +95,7 @@ const showRegisterDialog = () => {
         realName: '',
         password: '',
         phone: '',
-        email: '',
-        role: 0
+        email: ''
     })
 }
 
@@ -199,13 +194,6 @@ const handleRegister = async () => {
 
                 <el-form-item label="邮箱" prop="email">
                     <el-input v-model="registerForm.email" placeholder="请输入邮箱" />
-                </el-form-item>
-
-                <el-form-item label="角色" prop="role">
-                    <el-select v-model="registerForm.role" placeholder="请选择角色">
-                        <el-option label="普通用户" :value="0" />
-                        <el-option label="管理员" :value="1" />
-                    </el-select>
                 </el-form-item>
             </el-form>
 

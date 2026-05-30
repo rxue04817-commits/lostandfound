@@ -26,4 +26,7 @@ public interface LostFoundMapper {
     List<LostFound> selectExpiredLostFound();
     @Delete("delete from lost_found where id=#{id}")
     void deleteById(Integer id);
+
+    @Select("select count(*) from lost_found where user_id = #{userId}")
+    int countByUserId(Integer userId);
 }

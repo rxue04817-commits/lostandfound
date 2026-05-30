@@ -242,15 +242,16 @@ public class LostServiceImpl implements LostService {
 
         throw new UnauthorizedException("无权限操作");
     }
-    public void deleteById(Integer id){
-        // 先删除评论记录
+    public void deleteById(Integer id, Integer userId, Integer userRole) {
+        LostFound lostFound = lostFoundMapper.getById(id);
+        if (lostFound == null) {
+            throw new NotFoundException("失物信息不存在");
+        }
+        if (userRole != 1 && !lostFound.getUserId().equals(userId)) {
+            throw new UnauthorizedException("无权限删除他人发布的信息");
+        }
         commentMapper.deleteByLostId(id);
-
-        // 再删除图片记录
         lostFoundImageMapper.deleteByLostFoundId(id);
-
-        // 最后删除失物信息本身
         lostFoundMapper.deleteById(id);
-
     }
 }

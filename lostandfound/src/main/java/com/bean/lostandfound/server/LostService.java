@@ -17,5 +17,5 @@ public interface LostService {
 
     void updateLostFoundStatus(Integer id, Integer status, Integer userId, Integer userRole);
 
-    void deleteById(Integer id);
+    void deleteById(Integer id, Integer userId, Integer userRole);
 }

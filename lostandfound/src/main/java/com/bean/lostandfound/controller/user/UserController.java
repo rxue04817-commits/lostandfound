@@ -1,6 +1,7 @@
 package com.bean.lostandfound.controller.user;
 
 import com.bean.lostandfound.exception.BaseException;
+import com.bean.lostandfound.exception.UnauthorizedException;
 import com.bean.lostandfound.pojo.dto.LoginDTO;
 import com.bean.lostandfound.pojo.dto.UserDTO;
 import com.bean.lostandfound.pojo.dto.UserProfileUpdateDTO;
@@ -11,6 +12,7 @@ import com.bean.lostandfound.pojo.vo.UserInfoVO;
 import com.bean.lostandfound.result.Result;
 import com.bean.lostandfound.server.OssService;
 import com.bean.lostandfound.server.UserService;
+import com.bean.lostandfound.utils.AuthHelper;
 import com.bean.lostandfound.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -28,13 +30,20 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
+    private AuthHelper authHelper;
+    @Autowired
     private OssService ossService;
     @PostMapping("/login")
     public Result<LoginResponseVO> login(@RequestBody LoginDTO loginDTO) {
         log.info("用户登录: {} ", loginDTO.getUsername());
 
         // 验证用户名和密码
-        User user = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
+        User user;
+        try {
+            user = userService.login(loginDTO.getUsername(), loginDTO.getPassword());
+        } catch (BaseException e) {
+            return Result.error(e.getMessage());
+        }
         if (user == null) {
             return Result.error("用户名或密码错误");
         }
@@ -87,25 +96,14 @@ public class UserController {
     @PutMapping("/profile")
     public Result<String> updateProfile(@RequestBody UserProfileUpdateDTO profileUpdateDTO,
                                         HttpServletRequest request) {
-        // 从token中获取当前用户ID
-        String token = request.getHeader(jwtUtil.getHeader());
-        System.out.println("当前用户的token"+token);
-        if (token == null ) {
-            return Result.error("未授权");
+        try {
+            Integer currentUserId = authHelper.getUserId(request);
+            log.info("用户更新个人信息: {}", currentUserId);
+            userService.updateUserProfile(currentUserId, profileUpdateDTO);
+            return Result.success("个人信息更新成功");
+        } catch (UnauthorizedException e) {
+            return Result.error(e.getMessage());
         }
-
-        if (!jwtUtil.validateToken(token)) {
-            return Result.error("token无效或已过期");
-        }
-
-        Integer currentUserId = jwtUtil.getUserIdFromToken(token);
-        log.info("用户更新个人信息: {}", currentUserId);
-        System.out.println(profileUpdateDTO);
-
-        // 直接调用完整的更新方法，它会处理所有字段包括头像
-        userService.updateUserProfile(currentUserId, profileUpdateDTO);
-
-        return Result.success("个人信息更新成功");
     }
 
     @PostMapping("/register")
@@ -121,24 +119,12 @@ public class UserController {
     public Result<String> uploadAvatar(@RequestParam("avatar") MultipartFile file,
                                        HttpServletRequest request) {
         try {
-            // 验证token
-            String token = request.getHeader(jwtUtil.getHeader());
-            if (token == null) {
-                return Result.error("未授权");
-            }
-
-            if (!jwtUtil.validateToken(token)) {
-                return Result.error("token无效或已过期");
-            }
-
-            // 上传文件到OSS
+            Integer userId = authHelper.getUserId(request);
             String fileUrl = ossService.uploadFile(file, "avatar/");
-
-            // 这里应该更新用户头像URL到数据库
-            Integer userId = jwtUtil.getUserIdFromToken(token);
             userService.updateUserProfile(userId, fileUrl);
-
             return Result.success(fileUrl);
+        } catch (UnauthorizedException e) {
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             return Result.error("头像上传失败: " + e.getMessage());
         }

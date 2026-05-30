@@ -18,7 +18,7 @@ export async function login(loginData) {
         userInfo: response.data.data.userInfoVO
       }
     } else {
-      return { success: false, message: response.data.message }
+      return { success: false, message: response.data.msg }
     }
   } catch (error) {
     return { success: false, message: '登录请求失败' }

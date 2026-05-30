@@ -6,7 +6,8 @@ import {
   Plus,
   Document,
   User,
-  DataAnalysis
+  DataAnalysis,
+  UserFilled
 } from '@element-plus/icons-vue'
 // 用户头像URL
 const userInfo = ref(null)
@@ -80,6 +81,12 @@ const isAdministrator = computed(() => {
                   <DataAnalysis />
                 </el-icon>
                 <span>管理员审核</span>
+              </el-menu-item>
+              <el-menu-item v-if="isAdministrator" index="/admin/users">
+                <el-icon>
+                  <UserFilled />
+                </el-icon>
+                <span>用户管理</span>
               </el-menu-item>
             </el-menu>
           </el-col>
