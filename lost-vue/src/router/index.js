@@ -37,6 +37,16 @@ const routes = [
         meta: { title: '个人信息', requiresAuth: true }
       },
       {
+        path: '/my-claims',
+        name: 'MyClaims',
+        component: () => import('@/views/lost/MyClaimsView.vue')
+      },
+      {
+        path: '/claim-manage',
+        name: 'ClaimManage',
+        component: () => import('@/views/lost/ClaimManageView.vue')
+      },
+      {
         path: '/statistics',
         component: () => import('@/views/statistics/StatisticsView.vue'),
         meta: { title: '数据统计', requiresAuth: true }

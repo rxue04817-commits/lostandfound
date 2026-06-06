@@ -1,13 +1,10 @@
 package com.bean.lostandfound.server.impl;
 
+import com.bean.lostandfound.context.BaseContext;
 import com.bean.lostandfound.exception.BaseException;
 import com.bean.lostandfound.exception.NotFoundException;
 import com.bean.lostandfound.exception.UnauthorizedException;
-import com.bean.lostandfound.mapper.CommentMapper;
-import com.bean.lostandfound.mapper.ItemCategoryMapper;
-import com.bean.lostandfound.mapper.LostFoundImageMapper;
-import com.bean.lostandfound.mapper.LostFoundMapper;
-import com.bean.lostandfound.mapper.UserMapper;
+import com.bean.lostandfound.mapper.*;
 import com.bean.lostandfound.pojo.dto.LostFoundDTO;
 import com.bean.lostandfound.pojo.dto.LostSearchDTO;
 import com.bean.lostandfound.pojo.dto.UpdateLostFoundDTO;
@@ -49,6 +46,9 @@ public class LostServiceImpl implements LostService {
 
     @Autowired
     private ItemCategoryMapper itemCategoryMapper;
+
+    @Autowired
+    private ClaimMapper claimMapper;
 
     @Override
     public PageResult getLostFoundList(LostSearchDTO lostSearchDTO) {
@@ -117,6 +117,27 @@ public class LostServiceImpl implements LostService {
             commentVOs = comments.stream().map(this::convertCommentToVO).collect(Collectors.toList());
         }
         detailVO.setComments(commentVOs);
+
+        if (lostFound.getItemType() != null && lostFound.getItemType() == 1) {
+            try {
+                Long currentId = com.bean.lostandfound.utils.BaseContext.getCurrentId();
+                Integer currentUserId = currentId != null ? currentId.intValue() : null;
+                if (currentUserId != null) {
+                    if (lostFound.getUserId().equals(currentUserId)) {
+                        int pendingCount = claimMapper.countPendingByLostFoundId(id);
+                        detailVO.setPendingClaimCount(pendingCount);
+                    } else {
+                        com.bean.lostandfound.pojo.entity.Claim claim = claimMapper.findLatestByLostFoundIdAndClaimerId(id, currentUserId);
+                        if (claim != null) {
+                            detailVO.setClaimStatus(claim.getStatus());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // If not logged in or other issues, ignore
+            }
+        }
+
         return detailVO;
     }
 

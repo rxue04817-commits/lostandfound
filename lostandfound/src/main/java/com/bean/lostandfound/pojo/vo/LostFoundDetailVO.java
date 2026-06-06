@@ -27,7 +27,9 @@ public class LostFoundDetailVO {
     private UserInfoVO userInfo;
     private List<String> images;
     private List<CommentVO> comments;
-
-
+    
+    // 对拾物额外返回
+    private Integer claimStatus; // 当前用户的认领状态
+    private Integer pendingClaimCount; // 待处理认领数量（仅发布者可见）
 }
 

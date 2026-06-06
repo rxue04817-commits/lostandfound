@@ -24,7 +24,7 @@
 import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
 import { getUserLostFoundList } from '@/api/lostApi'
-import { ITEM_TYPE_LABEL, getStatusLabel } from '@/utils/itemConstants'
+import { getStatusLabel } from '@/utils/itemConstants'
 
 const typeChart = ref(null)
 const statusChart = ref(null)

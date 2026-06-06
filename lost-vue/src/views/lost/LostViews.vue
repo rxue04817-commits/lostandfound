@@ -1,7 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getLostFoundList, getLostFoundDetail, postComment, getCategories } from '@/api/lostApi'
+import claimApi from '@/api/claimApi'
+import { useStore } from 'vuex'
 import {
   ITEM_TYPE_LABEL,
   ITEM_TYPE_TAG,
@@ -10,6 +12,9 @@ import {
   getLocationLabel,
   getDateLabel
 } from '@/utils/itemConstants'
+
+const store = useStore()
+const currentUser = computed(() => store.state.user)
 
 const activeTypeTab = ref('')
 const categories = ref([])
@@ -28,6 +33,44 @@ const currentLostFound = ref(null)
 const loading = ref(false)
 const detailDialogVisible = ref(false)
 const commentForm = ref({ content: '' })
+
+const claimDialogVisible = ref(false)
+const claimForm = ref({ description: '', contactPhone: '' })
+const submittingClaim = ref(false)
+
+const showClaimDialog = () => {
+  claimForm.value = { description: '', contactPhone: currentUser.value?.phone || '' }
+  claimDialogVisible.value = true
+}
+
+const submitClaim = async () => {
+  if (!claimForm.value.description.trim() || !claimForm.value.contactPhone.trim()) {
+    ElMessage.warning('请填写认领说明和联系电话')
+    return
+  }
+  submittingClaim.value = true
+  try {
+    const data = {
+      lostFoundId: currentLostFound.value.id,
+      description: claimForm.value.description,
+      contactPhone: claimForm.value.contactPhone
+    }
+    const result = await claimApi.submitClaim(data)
+    console.log(result.data)
+    if (result.data.code === 1) {
+      ElMessage.success('认领申请已提交，等待拾得者审核')
+      claimDialogVisible.value = false
+      // 刷新详情状态
+      await showDetail(currentLostFound.value.id)
+    } else {
+      ElMessage.error(result.data.msg || '操作失败')
+    }
+  } catch (error) {
+    ElMessage.error('网络请求异常')
+  } finally {
+    submittingClaim.value = false
+  }
+}
 
 const fetchLostFoundList = async () => {
   loading.value = true
@@ -289,7 +332,30 @@ onMounted(async () => {
         </div>
       </div>
       <template #footer>
-        <el-button @click="detailDialogVisible = false">关闭</el-button>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <template v-if="currentLostFound?.itemType === 1 && currentLostFound?.status === 1 && currentLostFound?.userId !== currentUser?.id">
+            <el-button v-if="currentLostFound.claimStatus === 0" disabled>认领待审核</el-button>
+            <el-button v-else-if="currentLostFound.claimStatus === 1" disabled type="success">认领已通过</el-button>
+            <el-button v-else-if="currentLostFound.claimStatus === 3" disabled type="success">认领已完成</el-button>
+            <el-button v-else type="primary" @click="showClaimDialog">申请认领</el-button>
+          </template>
+          <el-button @click="detailDialogVisible = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="claimDialogVisible" title="申请认领" width="500px">
+      <el-form :model="claimForm" label-width="100px">
+        <el-form-item label="认领说明" required>
+          <el-input v-model="claimForm.description" type="textarea" placeholder="请详细描述物品特征以证明您是失主" rows="4" />
+        </el-form-item>
+        <el-form-item label="联系电话" required>
+          <el-input v-model="claimForm.contactPhone" placeholder="请输入您的联系电话" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="claimDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitClaim" :loading="submittingClaim">提交申请</el-button>
       </template>
     </el-dialog>
   </div>

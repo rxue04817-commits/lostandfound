@@ -48,7 +48,7 @@ const loadUserProfile = async () => {
     }
   } catch (error) {
     ElMessage.error('获取用户信息时出现错误')
-    console.error(error)
+
   } finally {
     dataLoading.value = false
   }
@@ -107,7 +107,7 @@ const handleSubmit = async () => {
       } */
       userInfo.value.password=passwordForm.value.newPassword
     }
-    console.log("修改的个人信息",userInfo.value)
+
     const result = await updateUserInfo(userInfo.value)
     if (result.success) {
       ElMessage.success(isChangingPassword.value ? '密码修改成功' : '个人信息更新成功')
@@ -144,7 +144,6 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     ElMessage.error(isChangingPassword.value ? '密码修改过程中出现错误' : '更新过程中出现错误')
-    console.error(error)
   } finally {
     loading.value = false
   }
@@ -201,7 +200,6 @@ const handleAvatarUpload = async (event) => {
     }
   } catch (error) {
     ElMessage.error('头像上传过程中出现错误')
-    console.error(error)
   }
 }
 </script>

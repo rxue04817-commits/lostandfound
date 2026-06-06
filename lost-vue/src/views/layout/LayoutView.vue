@@ -1,22 +1,36 @@
 <script setup>
-import { ref, onMounted,computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getUserInfo, removeUserInfo, removeToken } from '@/utils/auth'
+import { getUserLostFoundList } from '@/api/lostApi'
 import {
   Plus,
   Document,
   User,
   DataAnalysis,
-  UserFilled
+  UserFilled,
+  Message,
+  Check
 } from '@element-plus/icons-vue'
 // 用户头像URL
 const userInfo = ref(null)
 const router = useRouter() // 正确初始化 router
-//const token = localStorage.getItem('token')
-// 组件挂载时加载用户信息
-onMounted(() => {
+const hasFoundItem = ref(false)
+
+//组件挂载时加载用户信息
+onMounted(async () => {
   userInfo.value = getUserInfo()
-  console.log('用户信息:', userInfo.value)
+ // console.log('用户信息:', userInfo.value)
+  if (userInfo.value) {
+    try {
+      const res = await getUserLostFoundList({ itemType: 1, size: 1 })
+      if (res.success && res.data.total > 0) {
+        hasFoundItem.value = true
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
 })
 const remove = () => {
   removeToken()  // 先移除token
@@ -63,6 +77,18 @@ const isAdministrator = computed(() => {
                   <Document />
                 </el-icon>
                 <span>信息浏览</span>
+              </el-menu-item>
+              <el-menu-item index="/my-claims">
+                <el-icon>
+                  <Message />
+                </el-icon>
+                <span>我的认领</span>
+              </el-menu-item>
+              <el-menu-item v-if="hasFoundItem" index="/claim-manage">
+                <el-icon>
+                  <Check />
+                </el-icon>
+                <span>认领管理</span>
               </el-menu-item>
               <el-menu-item index="/profile">
                 <el-icon>
