@@ -22,7 +22,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/user/login",      // 排除登录接口
                         "/user/register",   // 排除注册接口
-                        "/error"            // 排除错误页面
+                        "/error",           // 排除错误页面
+                        "/donation/notify",  // 排除支付宝异步通知接口
+                        "/donation/return"   // 排除支付宝同步回调接口
                 );
     }
 }

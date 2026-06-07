@@ -134,6 +134,27 @@
         <el-button type="primary" @click="updatePost">保存</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="donationDialogVisible" title="恭喜找回失物！" width="400px" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+      <div style="text-align: center;">
+        <p>感谢使用本平台！您的支持是我们持续运营的动力。</p>
+        <div style="margin: 20px 0;">
+          <el-radio-group v-model="donationAmount" @change="handleAmountChange">
+            <el-radio-button :value="6.6">6.6元</el-radio-button>
+            <el-radio-button :value="8.8">8.8元</el-radio-button>
+            <el-radio-button :value="18.8">18.8元</el-radio-button>
+            <el-radio-button :value="0">自定义</el-radio-button>
+          </el-radio-group>
+        </div>
+        <div v-if="isCustomAmount" style="margin-bottom: 20px;">
+          <el-input-number v-model="donationAmount" :min="0.1" :precision="2" :step="1" placeholder="请输入金额" />
+        </div>
+      </div>
+      <template #footer>
+        <el-button @click="skipDonation">下次一定</el-button>
+        <el-button type="primary" @click="handleDonationSubmit">感谢平台(支付宝支付)</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -156,6 +177,8 @@ import {
   getDateLabel
 } from '@/utils/itemConstants'
 
+import donationApi from '@/api/donationApi'
+
 const categories = ref([])
 const searchForm = ref({ title: '', itemType: null, categoryId: null, status: null })
 const pagination = ref({ page: 1, size: 10, total: 0 })
@@ -174,6 +197,64 @@ const editForm = ref({
 })
 const imageFiles = ref([])
 const windowURL = URL
+
+const donationDialogVisible = ref(false)
+const donationAmount = ref(6.6)
+const isCustomAmount = ref(false)
+const currentFoundItem = ref(null)
+
+const showDonationDialog = (row) => {
+  currentFoundItem.value = row
+  donationAmount.value = 6.6
+  isCustomAmount.value = false
+  donationDialogVisible.value = true
+}
+
+const handleAmountChange = (val) => {
+  if (val === 0) {
+    isCustomAmount.value = true
+    donationAmount.value = 0 // 切换到自定义时清空金额
+  } else {
+    isCustomAmount.value = false
+  }
+}
+
+const handleDonationSubmit = async () => {
+  if (isCustomAmount.value && (!donationAmount.value || donationAmount.value <= 0)) {
+    ElMessage.warning('请输入有效的打赏金额')
+    return
+  }
+  const amountToPay = isCustomAmount.value ? donationAmount.value : (donationAmount.value === 0 ? 0.1 : donationAmount.value);
+  if(amountToPay <= 0) {
+      ElMessage.warning('请输入有效的打赏金额')
+      return
+  }
+  
+  try {
+    const res = await donationApi.pay({
+      lostFoundId: currentFoundItem.value.id,
+      amount: amountToPay
+    })
+    console.log("Payment ", res)
+    if (res.success && res.data) {
+      // 支付宝返回的是HTML表单，我们可以将其写入一个临时div并提交
+      const div = document.createElement('div')
+      div.innerHTML = res.data
+      document.body.appendChild(div)
+      document.forms[document.forms.length - 1].submit()
+    } else {
+      ElMessage.error(res.message || '发起支付失败')
+    }
+  } catch (error) {
+    console.error('Payment error:', error)
+    ElMessage.error('网络请求异常')
+  }
+}
+
+const skipDonation = () => {
+  donationDialogVisible.value = false
+  fetchMyPostsList()
+}
 
 const fetchMyPostsList = async () => {
   loading.value = true
@@ -293,7 +374,7 @@ const updatePostStatus = async (row) => {
     const result = await updateLostFoundStatus(row.id, 2)
     if (result.success) {
       ElMessage.success('状态更新成功')
-      fetchMyPostsList()
+      showDonationDialog(row)
     } else {
       ElMessage.error(result.message || '状态更新失败')
     }

@@ -95,3 +95,18 @@ export async function updateUserRole(id, role) {
     }
   }
 }
+
+export async function getStats() {
+  try {
+    const response = await request.get('/admin/stats')
+    if (response.data.code === 1) {
+      return { success: true, data: response.data.data }
+    }
+    return { success: false, message: response.data.msg || '获取统计数据失败' }
+  } catch (error) {
+    return {
+      success: false,
+      message: error.response?.data?.msg || '获取统计数据失败'
+    }
+  }
+}

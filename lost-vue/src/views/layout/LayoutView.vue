@@ -84,6 +84,12 @@ const isAdministrator = computed(() => {
                 </el-icon>
                 <span>我的认领</span>
               </el-menu-item>
+              <el-menu-item index="/my-donations">
+                <el-icon>
+                  <DataAnalysis />
+                </el-icon>
+                <span>我的打赏</span>
+              </el-menu-item>
               <el-menu-item v-if="hasFoundItem" index="/claim-manage">
                 <el-icon>
                   <Check />
@@ -113,6 +119,12 @@ const isAdministrator = computed(() => {
                   <UserFilled />
                 </el-icon>
                 <span>用户管理</span>
+              </el-menu-item>
+              <el-menu-item v-if="isAdministrator" index="/admin/donation-manage">
+                <el-icon>
+                  <DataAnalysis />
+                </el-icon>
+                <span>打赏管理</span>
               </el-menu-item>
             </el-menu>
           </el-col>

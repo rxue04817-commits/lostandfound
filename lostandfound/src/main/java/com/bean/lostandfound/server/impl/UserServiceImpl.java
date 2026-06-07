@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         int sequence = 100000;
 
         do {
-            generatedUsername = "student" + sequence;
+            generatedUsername = String.valueOf(sequence);
             sequence++;
             User existingUser = userMapper.getByUsername(generatedUsername);
             if (existingUser == null) {

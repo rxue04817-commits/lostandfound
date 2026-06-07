@@ -47,6 +47,12 @@ const routes = [
         component: () => import('@/views/lost/ClaimManageView.vue')
       },
       {
+        path: '/my-donations',
+        name: 'MyDonations',
+        component: () => import('@/views/lost/MyDonationsView.vue'),
+        meta: { title: '我的打赏', requiresAuth: true }
+      },
+      {
         path: '/statistics',
         component: () => import('@/views/statistics/StatisticsView.vue'),
         meta: { title: '数据统计', requiresAuth: true }
@@ -62,8 +68,19 @@ const routes = [
         name: 'AdminUsers',
         component: () => import('@/views/admin/AdminUserManagement.vue'),
         meta: { requiresAuth: true, requiresAdmin: true }
+      },
+      {
+        path: '/admin/donation-manage',
+        name: 'AdminDonationManage',
+        component: () => import('@/views/admin/AdminDonationManage.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
       }
     ]
+  },
+  {
+    path: '/alipay-return',
+    name: 'AlipayReturn',
+    component: () => import('@/views/lost/AlipayReturnView.vue')
   },
   {
     path: '/login',

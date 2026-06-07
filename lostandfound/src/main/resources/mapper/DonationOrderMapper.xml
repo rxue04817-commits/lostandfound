@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bean.lostandfound.mapper.DonationOrderMapper">
+
+    <insert id="insert">
+        INSERT INTO donation_order (out_trade_no, user_id, lost_found_id, total_amount, subject, trade_status, created_at, updated_at)
+        VALUES (#{outTradeNo}, #{userId}, #{lostFoundId}, #{totalAmount}, #{subject}, #{tradeStatus}, NOW(), NOW())
+    </insert>
+
+    <select id="findByUserId" resultType="com.bean.lostandfound.pojo.vo.DonationOrderVO">
+        SELECT d.*, l.title as lostFoundTitle
+        FROM donation_order d
+        LEFT JOIN lost_found l ON d.lost_found_id = l.id
+        WHERE d.user_id = #{userId}
+        ORDER BY d.created_at DESC
+    </select>
+
+    <select id="findAll" resultType="com.bean.lostandfound.pojo.vo.DonationOrderVO">
+        SELECT d.*, u.username, l.title as lostFoundTitle
+        FROM donation_order d
+        LEFT JOIN user u ON d.user_id = u.id
+        LEFT JOIN lost_found l ON d.lost_found_id = l.id
+        ORDER BY d.created_at DESC
+    </select>
+
+    <select id="getDailyStatistics" resultType="java.util.Map">
+        SELECT DATE(created_at) as date, SUM(total_amount) as total
+        FROM donation_order
+        WHERE trade_status IN ('TRADE_SUCCESS', 'TRADE_FINISHED')
+        GROUP BY DATE(created_at)
+        ORDER BY DATE(created_at) ASC
+        LIMIT 30
+    </select>
+
+</mapper>

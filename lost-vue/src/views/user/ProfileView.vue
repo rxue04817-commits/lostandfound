@@ -11,7 +11,7 @@ const userInfo = ref({
   avatar: '',
   password:''
 })
-
+const tempAvatar = ref('')
 const passwordForm = ref({
   oldPassword: '',
   newPassword: '',
@@ -41,7 +41,7 @@ const loadUserProfile = async () => {
       userInfo.value.email = user.email || ''
       userInfo.value.avatar = user.avatar || ''
       userInfo.value.password = user.password || ''
-      // 保存原始数据副本
+      tempAvatar.value = userInfo.value.avatar
       originalUserInfo.value = { ...userInfo.value }
     } else {
       ElMessage.error('获取用户信息失败')
@@ -107,11 +107,13 @@ const handleSubmit = async () => {
       } */
       userInfo.value.password=passwordForm.value.newPassword
     }
-
-    const result = await updateUserInfo(userInfo.value)
+    const submitData = {
+      ...userInfo.value,
+      avatar:userInfo.value.avatar
+    }
+    const result = await updateUserInfo(submitData)
     if (result.success) {
       ElMessage.success(isChangingPassword.value ? '密码修改成功' : '个人信息更新成功')
-      
       // 更新本地存储的用户信息
       if (currentUser.value) {
         const updatedUser = {
@@ -152,6 +154,7 @@ const handleSubmit = async () => {
 
 const startEdit = () => {
   isEditing.value = true
+  tempAvatar.value = userInfo.value.avatar
 }
 
 const cancelEdit = () => {
@@ -159,6 +162,7 @@ const cancelEdit = () => {
   isChangingPassword.value = false
   // 恢复原始数据
   userInfo.value = { ...originalUserInfo.value }
+  tempAvatar.value = originalUserInfo.value.avatar
   // 清空密码表单
   passwordForm.value.oldPassword = ''
   passwordForm.value.newPassword = ''
@@ -170,10 +174,18 @@ const startChangePassword = () => {
 }
 // 头像上传相关函数
 const triggerFileSelect = () => {
+  // 【修改】非编辑模式下禁止触发
+  if (!isEditing.value) {
+    ElMessage.warning('请先点击“编辑信息”以修改个人资料')
+    return
+  }
   fileInput.value.click()
 }
 
 const handleAvatarUpload = async (event) => {
+  if (!isEditing.value) {
+    return
+  }
   const file = event.target.files[0]
   if (!file) return
 
@@ -191,6 +203,7 @@ const handleAvatarUpload = async (event) => {
 
   try {
     const result = await uploadAvatar(file)
+    console.log(result)
     if (result.success) {
       ElMessage.success('头像上传成功')
       // 更新头像URL
@@ -200,6 +213,10 @@ const handleAvatarUpload = async (event) => {
     }
   } catch (error) {
     ElMessage.error('头像上传过程中出现错误')
+  }
+  finally {
+    // 清空 input，允许重复上传同一张图
+    event.target.value = ''
   }
 }
 </script>
@@ -227,8 +244,14 @@ const handleAvatarUpload = async (event) => {
       <el-form-item label="头像">
         <div class="avatar-container">
           <el-avatar :size="80"
-            :src="userInfo.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
-          <el-button @click="triggerFileSelect" style="margin-top: 10px;">
+                     :src="userInfo.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
+
+          <!-- 【修改】增加 :disabled="!isEditing"，非编辑模式禁用按钮 -->
+          <el-button
+              @click="triggerFileSelect"
+              style="margin-top: 10px;"
+              :disabled="!isEditing"
+          >
             上传头像
           </el-button>
           <input ref="fileInput" type="file" accept="image/*" @change="handleAvatarUpload" style="display: none" />
