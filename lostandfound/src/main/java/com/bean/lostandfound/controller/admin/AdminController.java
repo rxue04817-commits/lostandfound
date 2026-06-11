@@ -69,4 +69,27 @@ public class AdminController {
             return Result.error("查询失败: " + e.getMessage());
         }
     }
+
+    /**
+     * 获取全平台统计数据（管理员专用）
+     * @return 所有失物信息列表（不分页）
+     */
+    @GetMapping("/statistics/all")
+    public Result<PageResult> getAllPlatformStatistics(HttpServletRequest request) {
+        try {
+            authHelper.requireAdmin(request);
+            
+            // 构造查询条件，获取所有数据
+            LostSearchDTO lostSearchDTO = new LostSearchDTO();
+            lostSearchDTO.setPage(1);
+            lostSearchDTO.setSize(100000); // 获取大量数据用于统计
+            
+            PageResult result = lostService.getLostFoundList(lostSearchDTO);
+            return Result.success(result);
+        } catch (UnauthorizedException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            return Result.error("查询失败: " + e.getMessage());
+        }
+    }
 }

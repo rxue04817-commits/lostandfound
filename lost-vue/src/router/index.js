@@ -3,6 +3,7 @@ import Login from '../views/UserLogin.vue'
 import LayoutView from '../views/layout/LayoutView.vue'
 import AdminDashboard from '../views/admin/AdminDashboard.vue'
 import { getToken, getUserInfo } from '@/utils/auth'
+import { checkPermission } from '@/config/permission'
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
         path: '/all-posts',
         component: () => import('@/views/lost/LostViews.vue'),
         meta: { title: '信息浏览', requiresAuth: true }
+      },
+      {
+        path: '/lost/detail/:id',
+        component: () => import('@/views/lost/LostDetailView.vue'),
+        meta: { title: '物品详情', requiresAuth: true }
       },
       {
         path: '/profile',
@@ -70,10 +76,16 @@ const routes = [
         meta: { requiresAuth: true, requiresAdmin: true }
       },
       {
-        path: '/admin/donation-manage',
-        name: 'AdminDonationManage',
-        component: () => import('@/views/admin/AdminDonationManage.vue'),
-        meta: { requiresAuth: true, requiresAdmin: true }
+        path: '/admin/donation-statistics',
+        name: 'DonationStatistics',
+        component: () => import('@/views/admin/DonationStatistics.vue'),
+        meta: { requiresAuth: true, requiresSuperAdmin: true }
+      },
+      {
+        path: '/admin/donation-orders',
+        name: 'DonationOrders',
+        component: () => import('@/views/admin/DonationOrders.vue'),
+        meta: { requiresAuth: true, requiresSuperAdmin: true }
       }
     ]
   },
@@ -98,18 +110,25 @@ router.beforeEach((to, from, next) => {
   const token = getToken()
   const userInfo = getUserInfo()
 
+  // 如果访问登录页，且已登录则跳转到主页
   if (to.path === '/login') {
     return token ? next('/layout') : next()
   }
 
+  // 检查是否需要认证
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (!token) {
+    if (!token || !userInfo) {
+      console.warn('未登录用户尝试访问需要认证的页面:', to.path)
       return next('/login')
     }
   }
 
-  if (to.matched.some((record) => record.meta.requiresAdmin)) {
-    if (!userInfo || userInfo.role !== 1) {
+  // 检查角色权限（使用新的权限配置）
+  if (userInfo && to.path !== '/layout') {
+    const hasPermission = checkPermission(userInfo.role, to.path)
+    if (!hasPermission) {
+      console.warn('用户权限不足，尝试访问:', to.path, '用户角色:', userInfo.role)
+      // 没有权限，重定向到默认页面
       return next('/publish')
     }
   }

@@ -25,8 +25,16 @@ public class AuthHelper {
     public void requireAdmin(HttpServletRequest request) {
         requireLogin(request);
         Integer role = jwtUtil.getRoleFromToken(getToken(request));
-        if (role == null || role != 1) {
+        if (role == null || role < 1) {
             throw new UnauthorizedException("无权限访问");
+        }
+    }
+
+    public void requireSuperAdmin(HttpServletRequest request) {
+        requireLogin(request);
+        Integer role = jwtUtil.getRoleFromToken(getToken(request));
+        if (role == null || role < 2) {
+            throw new UnauthorizedException("无权限访问，需要超级管理员权限");
         }
     }
 

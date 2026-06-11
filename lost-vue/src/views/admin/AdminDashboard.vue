@@ -203,6 +203,7 @@ const handleCurrentChange = (page) => {
 const approvePost = async (id) => {
   ElMessageBox.confirm('确定要通过审核吗？', '提示', { type: 'warning' }).then(async () => {
     const result = await updateLostFoundStatus(id, 1)
+    console.log(result)
     if (result.success) {
       ElMessage.success('审核通过成功')
       fetchLostFoundList()

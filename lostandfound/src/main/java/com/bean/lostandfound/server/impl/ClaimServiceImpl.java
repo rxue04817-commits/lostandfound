@@ -179,12 +179,17 @@ public class ClaimServiceImpl implements ClaimService {
             throw new BaseException("无权操作");
         }
         
-        claimMapper.updateStatus(id, 3, null); // 已完成
+        // 更新认领状态为已完成
+        claimMapper.updateStatus(id, 3, null);
         
+        // 同步更新失物/拾物状态为已归还（status=2）
         LostFound updateLf = new LostFound();
         updateLf.setId(claim.getLostFoundId());
-        updateLf.setStatus(2);
-        lostFoundMapper.updateStatus(updateLf); // 拾物状态变为已归还
+        updateLf.setStatus(2); // 2=已找回/已归还
+        updateLf.setUpdatedAt(java.time.LocalDateTime.now()); // 设置更新时间
+        lostFoundMapper.updateStatus(updateLf);
+        
+        System.out.println("认领完成，物品ID: " + claim.getLostFoundId() + " 状态已更新为: 2 (已归还)");
     }
     
     private ClaimVO convertToVO(Claim claim) {

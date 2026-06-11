@@ -357,7 +357,7 @@ const updatePost = async () => {
     }
     const result = await updateLostFound(editForm.value.id, postData)
     if (result.success) {
-      ElMessage.success('更新成功')
+      ElMessage.success('更新成功，等待管理员审核')
       editDialogVisible.value = false
       fetchMyPostsList()
     } else {
@@ -391,7 +391,9 @@ onMounted(async () => {
 <style scoped>
 .my-posts-container { padding: 20px; }
 .search-card { margin-bottom: 20px; }
-.list-card { margin-top: 20px; }
+.list-card { margin-top: 20px;
+height: 500px;
+}
 .tip-text { margin-left: 8px; color: #909399; font-size: 12px; }
 .image-upload-area { margin-top: 10px; }
 .image-preview { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }

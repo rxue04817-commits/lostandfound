@@ -2,7 +2,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { User, Lock } from '@element-plus/icons-vue'
+import { User, Lock, CircleCheck } from '@element-plus/icons-vue'
 import { login, register } from '@/api/userApi'
 
 // 路由实例
@@ -130,274 +130,543 @@ const handleRegister = async () => {
 }
 </script>
 <template>
-    <span class="title">失物招领平台</span><br>
     <div class="login-container">
-        <el-card class="login-card">
-            <template #header>
-                <div class="login-header">
+        <!-- 背景装饰 -->
+        <div class="bg-decoration">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+            <div class="circle circle-3"></div>
+        </div>
 
-                    <span>用户登录</span>
+        <!-- 主标题 -->
+        <h1 class="main-title">失物招领平台</h1>
+
+        <!-- 登录卡片 -->
+        <el-card class="login-card" shadow="never">
+            <div class="card-header">
+                <div class="header-icon">
+                    <el-icon :size="32"><User /></el-icon>
                 </div>
-            </template>
-            <el-form :model="loginForm" :rules="loginRules" ref="loginFormRef" class="login-form"
-                @submit.prevent="handleLogin">
-                <el-form-item label="用户名" prop="username">
-                    <el-input v-model="loginForm.username" placeholder="请输入用户名" clearable>
+                <h2 class="header-text">用户登录</h2>
+            </div>
+
+            <el-form 
+                :model="loginForm" 
+                :rules="loginRules" 
+                ref="loginFormRef" 
+                class="login-form"
+                @submit.prevent="handleLogin"
+            >
+                <el-form-item prop="username">
+                    <el-input 
+                        v-model="loginForm.username" 
+                        placeholder="请输入用户名" 
+                        size="large"
+                        clearable
+                    >
                         <template #prefix>
-                            <el-icon>
-                                <User />
-                            </el-icon>
+                            <el-icon><User /></el-icon>
                         </template>
                     </el-input>
                 </el-form-item>
 
-                <el-form-item label="密码" prop="password">
-                    <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" show-password>
+                <el-form-item prop="password">
+                    <el-input 
+                        v-model="loginForm.password" 
+                        type="password" 
+                        placeholder="请输入密码" 
+                        size="large"
+                        show-password
+                    >
                         <template #prefix>
-                            <el-icon>
-                                <Lock />
-                            </el-icon>
+                            <el-icon><Lock /></el-icon>
                         </template>
                     </el-input>
                 </el-form-item>
 
                 <el-form-item>
-                    <el-button type="primary" @click="handleLogin" :loading="loading" class="login-button">
-                        登录
+                    <el-button 
+                        type="primary" 
+                        @click="handleLogin" 
+                        :loading="loading" 
+                        class="login-button"
+                        size="large"
+                    >
+                        登 录
                     </el-button>
                 </el-form-item>
             </el-form>
 
             <div class="register-link">
-                还没有账号？
-                <el-button type="text" @click="showRegisterDialog">
+                <span>还没有账号？</span>
+                <el-button type="text" @click="showRegisterDialog" class="register-btn">
                     立即注册
                 </el-button>
             </div>
         </el-card>
 
         <!-- 注册对话框 -->
-        <el-dialog v-model="registerDialogVisible" title="用户注册" width="400px" :close-on-click-modal="false">
-            <el-form :model="registerForm" :rules="registerRules" ref="registerFormRef"
-                @submit.prevent="handleRegister">
+        <el-dialog 
+            v-model="registerDialogVisible" 
+            width="500px" 
+            :close-on-click-modal="false"
+            class="register-dialog"
+        >
+            <template #header>
+                <div class="dialog-header">
+                    <div class="header-icon">
+                        <el-icon :size="28"><User /></el-icon>
+                    </div>
+                    <h2 class="dialog-title">用户注册</h2>
+                </div>
+            </template>
+
+            <el-form 
+                :model="registerForm" 
+                :rules="registerRules" 
+                ref="registerFormRef"
+                class="register-form"
+                @submit.prevent="handleRegister"
+            >
                 <el-form-item label="真实姓名" prop="realName">
-                    <el-input v-model="registerForm.realName" placeholder="请输入真实姓名" />
+                    <el-input 
+                        v-model="registerForm.realName" 
+                        placeholder="请输入真实姓名"
+                        size="large"
+                    />
                 </el-form-item>
 
                 <el-form-item label="密码" prop="password">
-                    <el-input v-model="registerForm.password" type="password" placeholder="请输入密码" show-password />
+                    <el-input 
+                        v-model="registerForm.password" 
+                        type="password" 
+                        placeholder="请输入密码（至少6位）" 
+                        size="large"
+                        show-password
+                    />
                 </el-form-item>
 
                 <el-form-item label="手机号" prop="phone">
-                    <el-input v-model="registerForm.phone" placeholder="请输入手机号" />
+                    <el-input 
+                        v-model="registerForm.phone" 
+                        placeholder="请输入手机号"
+                        size="large"
+                    />
                 </el-form-item>
 
                 <el-form-item label="邮箱" prop="email">
-                    <el-input v-model="registerForm.email" placeholder="请输入邮箱" />
+                    <el-input 
+                        v-model="registerForm.email" 
+                        placeholder="请输入邮箱地址"
+                        size="large"
+                    />
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button 
+                        type="primary" 
+                        @click="handleRegister" 
+                        :loading="registerLoading"
+                        class="register-submit-btn"
+                        size="large"
+                    >
+                        注 册
+                    </el-button>
                 </el-form-item>
             </el-form>
-
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="registerDialogVisible = false">取消</el-button>
-                    <el-button type="primary" @click="handleRegister" :loading="registerLoading">
-                        注册
-                    </el-button>
-                </span>
-            </template>
         </el-dialog>
+
         <!-- 用户名确认对话框 -->
-        <el-dialog v-model="centerDialogVisible" title="欢迎" width="500" align-center>
-            <span>您的用户名是:{{ username }}</span>
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button type="primary" @click="centerDialogVisible = false">
-                        确认
-                    </el-button>
+        <el-dialog 
+            v-model="centerDialogVisible" 
+            title="注册成功" 
+            width="400px" 
+            align-center
+            class="success-dialog"
+        >
+            <div class="success-content">
+                <div class="success-icon">
+                    <el-icon :size="60" color="#67c23a"><CircleCheck /></el-icon>
                 </div>
+                <h3>欢迎加入失物招领平台！</h3>
+                <p class="username-text">您的用户名是：<strong>{{ username }}</strong></p>
+                <p class="tip-text">请使用该用户名登录系统</p>
+            </div>
+            <template #footer>
+                <el-button 
+                    type="primary" 
+                    @click="centerDialogVisible = false"
+                    size="large"
+                    class="confirm-btn"
+                >
+                    确认
+                </el-button>
             </template>
         </el-dialog>
     </div>
 </template>
 
 <style scoped>
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* 全局容器 - 占满整个屏幕 */
+.login-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 背景装饰圆圈 */
+.bg-decoration {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float 20s infinite ease-in-out;
+}
+
+.circle-1 {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -50px;
+    animation-delay: 0s;
+}
+
+.circle-2 {
+    width: 200px;
+    height: 200px;
+    bottom: -50px;
+    left: -50px;
+    animation-delay: 5s;
+}
+
+.circle-3 {
+    width: 150px;
+    height: 150px;
+    top: 50%;
+    left: 20%;
+    animation-delay: 10s;
 }
 
 @keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-30px) rotate(180deg);
+    }
 }
 
-.title {
-  font-size: 42px;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-  display: block;
-  margin-bottom: 30px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 1s ease-out;
+/* 主标题 - 无背景色 */
+.main-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 40px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    letter-spacing: 8px;
+    animation: fadeInDown 1s ease-out;
+    z-index: 10;
 }
 
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  position: relative;
-  overflow: hidden;
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.login-container::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-  animation: rotate 20s linear infinite;
-  z-index: 0;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+/* 登录卡片 */
 .login-card {
-  width: 420px;
-  border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  transition: all 0.3s ease;
-  animation: fadeIn 0.8s ease-out;
-  z-index: 1;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 480px;
+    border-radius: 20px;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 0.8s ease-out;
+    z-index: 10;
 }
 
-.login-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.login-header {
-  text-align: center;
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
-  padding: 25px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  position: relative;
+/* 卡片头部 */
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 35px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
 }
 
-.login-header::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 3px;
-  background: #409eff;
-  border-radius: 3px;
+.header-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
+.header-text {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+/* 表单样式 */
 .login-form {
-  margin-top: 20px;
-  padding: 0 30px 20px;
+    margin-top: 10px;
 }
 
 .login-form .el-form-item {
-  margin-bottom: 25px;
+    margin-bottom: 25px;
 }
 
-.login-form .el-form-item__label {
-  color: #555;
-  font-weight: 500;
+.login-form :deep(.el-input__wrapper) {
+    border-radius: 12px;
+    padding: 12px 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
 }
 
+.login-form :deep(.el-input__wrapper:hover) {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.login-form :deep(.el-input__wrapper.is-focus) {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+}
+
+/* 登录按钮 */
 .login-button {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  border-radius: 8px;
-  margin-top: 10px;
-  transition: all 0.3s ease;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  font-weight: 500;
-  letter-spacing: 1px;
+    width: 100%;
+    height: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 12px;
+    margin-top: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .login-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
 }
 
 .login-button:active {
-  transform: translateY(0);
+    transform: translateY(0);
 }
 
+/* 注册链接 */
 .register-link {
-  text-align: center;
-  margin-top: 25px;
-  color: #666;
-  padding: 20px;
-  border-top: 1px solid #eee;
-  font-size: 14px;
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e8e8e8;
+    color: #666;
+    font-size: 14px;
 }
 
-.register-link .el-button--text {
-  color: #667eea;
-  font-weight: 500;
-  font-size: 14px;
-  transition: all 0.3s ease;
+.register-btn {
+    color: #667eea;
+    font-weight: 600;
+    font-size: 15px;
+    margin-left: 8px;
+    transition: all 0.3s ease;
 }
 
-.register-link .el-button--text:hover {
-  color: #764ba2;
-  transform: scale(1.05);
+.register-btn:hover {
+    color: #764ba2;
+    transform: scale(1.05);
 }
 
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 0 20px 20px;
+/* 注册对话框样式 */
+.register-dialog :deep(.el-dialog) {
+    border-radius: 20px;
+    overflow: hidden;
 }
 
-.dialog-footer .el-button {
-  border-radius: 6px;
-  padding: 8px 20px;
+.register-dialog :deep(.el-dialog__header) {
+    margin: 0;
+    padding: 0;
+    border-bottom: none;
 }
 
-.dialog-footer .el-button--primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
+.dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.dialog-header .header-icon {
+    width: 45px;
+    height: 45px;
+}
+
+.dialog-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.register-dialog :deep(.el-dialog__body) {
+    padding: 35px 30px 25px;
+}
+
+.register-form .el-form-item {
+    margin-bottom: 22px;
+}
+
+.register-form :deep(.el-form-item__label) {
+    font-weight: 500;
+    color: #555;
+}
+
+.register-form :deep(.el-input__wrapper) {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.register-submit-btn {
+    width: 100%;
+    height: 48px;
+    font-size: 17px;
+    font-weight: 600;
+    border-radius: 10px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    letter-spacing: 2px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.register-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+/* 成功对话框 */
+.success-dialog :deep(.el-dialog) {
+    border-radius: 20px;
+}
+
+.success-content {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.success-icon {
+    margin-bottom: 20px;
+    animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.success-content h3 {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.username-text {
+    font-size: 16px;
+    color: #666;
+    margin: 15px 0;
+}
+
+.username-text strong {
+    color: #667eea;
+    font-size: 18px;
+}
+
+.tip-text {
+    font-size: 14px;
+    color: #999;
+    margin-top: 10px;
+}
+
+.confirm-btn {
+    width: 100%;
+    height: 45px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 36px;
+        letter-spacing: 4px;
+    }
+
+    .login-card {
+        width: 90%;
+        max-width: 400px;
+        padding: 30px 25px;
+    }
+
+    .register-dialog :deep(.el-dialog) {
+        width: 90% !important;
+    }
 }
 </style>

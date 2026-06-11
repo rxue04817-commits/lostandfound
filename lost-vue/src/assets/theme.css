@@ -1,0 +1,189 @@
+/* 全局主题配色方案 */
+:root {
+  /* 主色调 - 现代蓝紫色渐变 */
+  --primary-color: #5393d6;
+  --primary-light: #66b1ff;
+  --primary-dark: #3a8ee6;
+  
+  /* 辅助色 */
+  --success-color: #67c23a;
+  --warning-color: #e6a23c;
+  --danger-color: #f56c6c;
+  --info-color: #909399;
+  
+  /* 渐变色 */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-sidebar: linear-gradient(180deg, #4b6cb7 0%, #182848 100%);
+  --gradient-card: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  
+  /* 文本颜色 */
+  --text-primary: #303133;
+  --text-regular: #606266;
+  --text-secondary: #909399;
+  --text-placeholder: #c0c4cc;
+  
+  /* 边框颜色 */
+  --border-base: #dcdfe6;
+  --border-light: #e4e7ed;
+  --border-lighter: #ebeef5;
+  --border-extra-light: #f2f6fc;
+  
+  /* 背景颜色 */
+  --bg-color: #f5f7fa;
+  --bg-white: #ffffff;
+  --bg-page: #f0f2f5;
+  
+  /* 阴影 */
+  --shadow-base: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+  --shadow-light: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  --shadow-dark: 0 4px 16px rgba(0, 0, 0, 0.15);
+  
+  /* 圆角 */
+  --radius-small: 4px;
+  --radius-base: 8px;
+  --radius-large: 12px;
+  --radius-round: 20px;
+}
+
+/* Element Plus 组件样式覆盖 */
+.el-button--primary {
+  background: var(--gradient-primary);
+  border: none;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+}
+
+.el-button--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+.el-card {
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.el-card:hover {
+  box-shadow: var(--shadow-dark);
+  transform: translateY(-2px);
+}
+
+.el-table {
+  border-radius: var(--radius-base);
+  overflow: hidden;
+}
+
+.el-table th {
+  background: var(--gradient-card) !important;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.el-table tr:hover > td {
+  background-color: rgba(64, 158, 255, 0.05) !important;
+}
+
+.el-tag {
+  border-radius: var(--radius-round);
+  padding: 0 12px;
+  border: none;
+}
+
+.el-input__wrapper,
+.el-textarea__inner {
+  border-radius: var(--radius-base);
+  box-shadow: 0 0 0 1px var(--border-base) inset;
+  transition: all 0.3s ease;
+}
+
+.el-input__wrapper:hover,
+.el-textarea__inner:hover {
+  box-shadow: 0 0 0 1px var(--primary-light) inset;
+}
+
+.el-input__wrapper.is-focus,
+.el-textarea__inner:focus {
+  box-shadow: 0 0 0 1px var(--primary-color) inset;
+}
+
+.el-pagination {
+  padding: 20px 0;
+}
+
+.el-pagination button:hover {
+  color: var(--primary-color);
+}
+
+.el-pagination .el-pager li:hover {
+  color: var(--primary-color);
+}
+
+.el-pagination .el-pager li.is-active {
+  background: var(--gradient-primary);
+  color: white;
+  border-radius: var(--radius-base);
+}
+
+/* 全局滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-base);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* 通用工具类 */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-regular {
+  color: var(--text-regular);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.bg-gradient {
+  background: var(--gradient-primary);
+}
+
+.shadow-card {
+  box-shadow: var(--shadow-light);
+}
+
+.rounded {
+  border-radius: var(--radius-base);
+}

@@ -6,29 +6,25 @@ export default {
   name: 'App'
 }
 </script>
-<style >
-.nav-links {
-  margin-bottom: 15px;
-}
-body {
-  background-image: url('img/image.png');
-  background-size: cover; /* 完全覆盖容器 */
-  background-position: center; /* 居中显示 */
-  background-repeat: no-repeat; /* 不重复 */
-  background-attachment: fixed; /* 固定背景 */
+<style>
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
-body::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+
+html, body {
   height: 100%;
-  background-color: rgba(142, 102, 104, 0.691); /* 白色半透明遮罩 */
-  z-index: -1;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+#app {
+  height: 100%;
+}
+
+/* 移除旧的body::before遮罩 */
 </style>
 
 

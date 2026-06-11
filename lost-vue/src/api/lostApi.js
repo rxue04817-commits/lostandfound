@@ -174,3 +174,26 @@ export async function updateLostFoundStatus(id, status) {
     }
   }
 }
+
+// 获取全平台统计数据（管理员专用）
+export async function getAllPlatformStatistics() {
+  try {
+    const response = await request.get('/admin/lostfound/statistics/all')
+    if (response.data.code === 1) {
+      return {
+        success: true,
+        data: response.data.data
+      }
+    } else {
+      return {
+        success: false,
+        message: response.data.msg
+      }
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: '获取全平台统计数据失败'
+    }
+  }
+}

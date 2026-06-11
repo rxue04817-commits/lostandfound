@@ -13,6 +13,7 @@
             content = #{content},
             location = #{location},
             date = #{date},
+            status = #{status},
             contact_phone = #{contactPhone},
             updated_at = #{updatedAt}
         WHERE id = #{id}

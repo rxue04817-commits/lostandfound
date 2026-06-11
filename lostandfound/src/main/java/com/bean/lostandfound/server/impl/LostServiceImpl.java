@@ -206,6 +206,7 @@ public class LostServiceImpl implements LostService {
 
         BeanUtils.copyProperties(updateLostFoundDTO, originalLostFound);
         originalLostFound.setUpdatedAt(LocalDateTime.now());
+        originalLostFound.setStatus(0);//重新审核
         lostFoundMapper.update(originalLostFound);
 
         lostFoundImageMapper.deleteByLostFoundId(id);
@@ -235,7 +236,7 @@ public class LostServiceImpl implements LostService {
     }
 
     private void validateStatusUpdate(LostFound lostFound, Integer newStatus, Integer userId, Integer userRole) {
-        if (userRole == 1) {
+        if (userRole >= 1) {
             if (newStatus != 0 && newStatus != 1 && newStatus != 3) {
                 throw new IllegalStateException("管理员只能将状态设置为待审核、已审核或已过期");
             }

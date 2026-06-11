@@ -36,7 +36,7 @@ public class AdminDonationController {
                                               @RequestParam(defaultValue = "10") int pageSize,
                                               HttpServletRequest request) {
         try {
-            authHelper.requireAdmin(request);
+            authHelper.requireSuperAdmin(request);
             return Result.success(donationService.getAllDonations(page, pageSize));
         } catch (UnauthorizedException e) {
             return Result.error(e.getMessage());
@@ -51,7 +51,7 @@ public class AdminDonationController {
     @GetMapping("/statistics")
     public Result<List<Map<String, Object>>> getStatistics(HttpServletRequest request) {
         try {
-            authHelper.requireAdmin(request);
+            authHelper.requireSuperAdmin(request);
             return Result.success(donationService.getDailyStatistics());
         } catch (UnauthorizedException e) {
             return Result.error(e.getMessage());
@@ -66,7 +66,7 @@ public class AdminDonationController {
     @GetMapping("/export")
     public void exportExcel(HttpServletResponse response, HttpServletRequest request) throws IOException {
         try {
-            authHelper.requireAdmin(request);
+            authHelper.requireSuperAdmin(request);
             
             // 获取所有数据，不分页或者查最大数量
             List<DonationOrderVO> list = (List<DonationOrderVO>) donationService.getAllDonations(1, 100000).getRecords();

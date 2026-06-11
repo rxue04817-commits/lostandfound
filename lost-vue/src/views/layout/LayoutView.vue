@@ -3,43 +3,55 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getUserInfo, removeUserInfo, removeToken } from '@/utils/auth'
 import { getUserLostFoundList } from '@/api/lostApi'
-import {
-  Plus,
-  Document,
-  User,
-  DataAnalysis,
-  UserFilled,
-  Message,
-  Check
-} from '@element-plus/icons-vue'
+import { filterMenusByRole } from '@/config/permission'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
 // 用户头像URL
 const userInfo = ref(null)
 const router = useRouter() // 正确初始化 router
 const hasFoundItem = ref(false)
+const visibleMenus = ref([])
 
 //组件挂载时加载用户信息
 onMounted(async () => {
   userInfo.value = getUserInfo()
- // console.log('用户信息:', userInfo.value)
-  if (userInfo.value) {
-    try {
-      const res = await getUserLostFoundList({ itemType: 1, size: 1 })
-      if (res.success && res.data.total > 0) {
-        hasFoundItem.value = true
-      }
-    } catch (error) {
-      console.error(error)
-    }
+  
+  // 如果没有用户信息，说明未登录，不应该发起请求
+  if (!userInfo.value) {
+    console.warn('未检测到用户信息，请检查登录状态')
+    return
   }
+  
+  try {
+    const res = await getUserLostFoundList({ itemType: 1, size: 1 })
+    if (res.success && res.data.total > 0) {
+      hasFoundItem.value = true
+    }
+  } catch (error) {
+    // 401错误会被拦截器处理，这里只需要记录日志
+    console.error('获取用户拾物列表失败:', error)
+  }
+  
+  // 根据用户角色过滤菜单
+  visibleMenus.value = filterMenusByRole(userInfo.value.role, {
+    hasFoundItem: hasFoundItem.value
+  })
 })
+
 const remove = () => {
   removeToken()  // 先移除token
   removeUserInfo()
   router.push('/login')
 }
-// 在 script setup 中添加
-const isAdministrator = computed(() => {
-  return userInfo.value && userInfo.value.role === 1
+
+// 获取图标组件
+const getIconComponent = (iconName) => {
+  return ElementPlusIconsVue[iconName]
+}
+
+// 当前激活的菜单
+const activeMenu = computed(() => {
+  return router.currentRoute.value.path
 })
 </script>
 <template>
@@ -60,71 +72,15 @@ const isAdministrator = computed(() => {
         <el-row class="tac">
           <el-col :span="24">
             <el-menu :default-active="activeMenu" class="el-menu-vertical-demo" router>
-              <el-menu-item index="/publish">
+              <el-menu-item 
+                v-for="menu in visibleMenus" 
+                :key="menu.path" 
+                :index="menu.path"
+              >
                 <el-icon>
-                  <Plus />
+                  <component :is="getIconComponent(menu.icon)" />
                 </el-icon>
-                <span>发布信息</span>
-              </el-menu-item>
-              <el-menu-item index="/my-posts">
-                <el-icon>
-                  <Document />
-                </el-icon>
-                <span>查看我的发布</span>
-              </el-menu-item>
-              <el-menu-item index="/all-posts">
-                <el-icon>
-                  <Document />
-                </el-icon>
-                <span>信息浏览</span>
-              </el-menu-item>
-              <el-menu-item index="/my-claims">
-                <el-icon>
-                  <Message />
-                </el-icon>
-                <span>我的认领</span>
-              </el-menu-item>
-              <el-menu-item index="/my-donations">
-                <el-icon>
-                  <DataAnalysis />
-                </el-icon>
-                <span>我的打赏</span>
-              </el-menu-item>
-              <el-menu-item v-if="hasFoundItem" index="/claim-manage">
-                <el-icon>
-                  <Check />
-                </el-icon>
-                <span>认领管理</span>
-              </el-menu-item>
-              <el-menu-item index="/profile">
-                <el-icon>
-                  <User />
-                </el-icon>
-                <span>修改个人信息</span>
-              </el-menu-item>
-              <el-menu-item index="/statistics">
-                <el-icon>
-                  <DataAnalysis />
-                </el-icon>
-                <span>数据统计</span>
-              </el-menu-item>
-              <el-menu-item v-if="isAdministrator" index="/admin">
-                <el-icon>
-                  <DataAnalysis />
-                </el-icon>
-                <span>管理员审核</span>
-              </el-menu-item>
-              <el-menu-item v-if="isAdministrator" index="/admin/users">
-                <el-icon>
-                  <UserFilled />
-                </el-icon>
-                <span>用户管理</span>
-              </el-menu-item>
-              <el-menu-item v-if="isAdministrator" index="/admin/donation-manage">
-                <el-icon>
-                  <DataAnalysis />
-                </el-icon>
-                <span>打赏管理</span>
+                <span>{{ menu.title }}</span>
               </el-menu-item>
             </el-menu>
           </el-col>
@@ -136,7 +92,7 @@ const isAdministrator = computed(() => {
         </el-main>
         <el-footer>
           <div class="footer-content">
-            <span>失物招领平台 © 2025</span>
+            <span>失物招领平台 © 2026</span>
             <span>联系方式：support@lostfound.com</span>
 
           </div>
@@ -152,8 +108,8 @@ const isAdministrator = computed(() => {
 }
 
 .layout-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: var(--gradient-primary);
+  box-shadow: var(--shadow-dark);
   padding: 0;
   height: 80px;
 }
@@ -174,6 +130,7 @@ const isAdministrator = computed(() => {
   text-align: center;
   flex: 1;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 2px;
 }
 
 .user-info {
@@ -182,8 +139,13 @@ const isAdministrator = computed(() => {
   gap: 16px;
   background: rgba(255, 255, 255, 0.15);
   padding: 8px 16px;
-  border-radius: 20px;
+  border-radius: var(--radius-round);
   backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.user-info:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .welcome-text {
@@ -195,6 +157,11 @@ const isAdministrator = computed(() => {
 .user-avatar {
   cursor: pointer;
   border: 2px solid white;
+  transition: transform 0.3s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.1);
 }
 
 .logout-btn {
@@ -202,10 +169,12 @@ const isAdministrator = computed(() => {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
+  transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
   background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .empty-placeholder {
@@ -213,12 +182,13 @@ const isAdministrator = computed(() => {
 }
 
 .el-footer {
-  background-color: #f8f9fa;
-  color: #6c757d;
+  background-color: var(--bg-white);
+  color: var(--text-secondary);
   text-align: center;
   padding: 16px 0;
   font-size: 14px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--border-lighter);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .footer-content {
@@ -230,9 +200,10 @@ const isAdministrator = computed(() => {
 }
 
 .sidebar {
-  background: linear-gradient(180deg, #4b6cb7 0%, #182848 100%);
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  background: var(--gradient-sidebar);
+  box-shadow: var(--shadow-base);
   height: calc(100vh - 80px);
+  overflow-y: auto;
 }
 
 .el-menu {
@@ -243,21 +214,26 @@ const isAdministrator = computed(() => {
 .el-menu-item {
   color: rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
+  border-radius: var(--radius-base);
+  margin: 4px 8px;
 }
 
 .el-menu-item:hover {
   background: rgba(255, 255, 255, 0.1) !important;
   color: white;
+  transform: translateX(4px);
 }
 
 .el-menu-item.is-active {
   background: rgba(255, 255, 255, 0.15) !important;
   color: white;
-  border-right: 3px solid #409eff;
+  border-right: 3px solid var(--primary-color);
+  font-weight: 600;
 }
 
 .el-main {
-  background-color: #f5f7fa;
+  background-color: var(--bg-page);
   padding: 20px;
+  overflow-y: auto;
 }
 </style>
